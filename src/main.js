@@ -5,6 +5,7 @@ import { SetupForm } from './components/SetupForm.js';
 import { Dashboard } from './components/Dashboard.js';
 import { FoodEntry } from './components/FoodEntry.js';
 import { PhotoAnalyzer } from './components/PhotoAnalyzer.js';
+import { WeeklySummary } from './components/WeeklySummary.js';
 import { getUserProfile } from './utils/api.js';
 
 class App {
@@ -66,7 +67,8 @@ class App {
       profile: this.profile,
       onAddFood: () => this.showFoodEntry(),
       onPhotoAnalyze: () => this.showPhotoAnalyzer(),
-      onSettings: () => this.showSetup(this.profile)
+      onSettings: () => this.showSetup(this.profile),
+      onWeeklySummary: () => this.showWeeklySummary()
     });
 
     this.app.appendChild(dashboard);
@@ -94,6 +96,15 @@ class App {
           this.currentPage.refresh();
         }
       }
+    });
+
+    document.body.appendChild(modal);
+  }
+
+  showWeeklySummary() {
+    const modal = WeeklySummary({
+      profile: this.profile,
+      onClose: () => { }
     });
 
     document.body.appendChild(modal);

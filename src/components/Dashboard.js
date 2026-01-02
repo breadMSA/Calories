@@ -3,21 +3,24 @@
 import { getRecords, deleteFoodEntry, getTodayDate, formatDate } from '../utils/api.js';
 import { calculatePercentage, formatNumber } from '../utils/calculator.js';
 
-export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings }) {
-    const container = document.createElement('div');
-    container.className = 'page';
+export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings, onWeeklySummary }) {
+  const container = document.createElement('div');
+  container.className = 'page';
 
-    const today = getTodayDate();
-    const targets = profile.targets;
+  const today = getTodayDate();
+  const targets = profile.targets;
 
-    container.innerHTML = `
+  container.innerHTML = `
     <div class="container">
       <header class="header">
         <div>
           <h1 class="header-title">今日攝取</h1>
           <p class="header-date">${formatDate(today)}</p>
         </div>
-        <button class="btn btn-icon btn-ghost" id="settings-btn">⚙️</button>
+        <div style="display: flex; gap: var(--space-xs);">
+          <button class="btn btn-icon btn-ghost" id="summary-btn" title="每週總表">📊</button>
+          <button class="btn btn-icon btn-ghost" id="settings-btn" title="設定">⚙️</button>
+        </div>
       </header>
       
       <div id="stats-container">
@@ -49,70 +52,72 @@ export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings }) {
     </div>
   `;
 
-    const statsContainer = container.querySelector('#stats-container');
-    const foodListContainer = container.querySelector('#food-list');
-    const settingsBtn = container.querySelector('#settings-btn');
-    const addBtn = container.querySelector('#add-btn');
-    const photoBtn = container.querySelector('#photo-btn');
+  const statsContainer = container.querySelector('#stats-container');
+  const foodListContainer = container.querySelector('#food-list');
+  const settingsBtn = container.querySelector('#settings-btn');
+  const summaryBtn = container.querySelector('#summary-btn');
+  const addBtn = container.querySelector('#add-btn');
+  const photoBtn = container.querySelector('#photo-btn');
 
-    // Event listeners
-    settingsBtn.addEventListener('click', onSettings);
-    addBtn.addEventListener('click', onAddFood);
-    photoBtn.addEventListener('click', onPhotoAnalyze);
+  // Event listeners
+  settingsBtn.addEventListener('click', onSettings);
+  summaryBtn.addEventListener('click', onWeeklySummary);
+  addBtn.addEventListener('click', onAddFood);
+  photoBtn.addEventListener('click', onPhotoAnalyze);
 
-    // Load and render data
-    async function loadData() {
-        try {
-            const data = await getRecords(today);
-            renderStats(data.totals || { calories: 0, protein: 0, sodium: 0, water: 0 });
-            renderFoodList(data.entries || []);
-        } catch (error) {
-            console.error('Load error:', error);
-            renderStats({ calories: 0, protein: 0, sodium: 0, water: 0 });
-            renderFoodList([]);
-        }
+  // Load and render data
+  async function loadData() {
+    try {
+      const data = await getRecords(today);
+      renderStats(data.totals || { calories: 0, protein: 0, sodium: 0, water: 0 });
+      renderFoodList(data.entries || []);
+    } catch (error) {
+      console.error('Load error:', error);
+      renderStats({ calories: 0, protein: 0, sodium: 0, water: 0 });
+      renderFoodList([]);
     }
+  }
 
-    function renderStats(totals) {
-        const nutrients = [
-            {
-                key: 'calories',
-                icon: '🔥',
-                name: '熱量',
-                unit: 'kcal',
-                color: 'var(--color-calories)'
-            },
-            {
-                key: 'protein',
-                icon: '💪',
-                name: '蛋白質',
-                unit: 'g',
-                color: 'var(--color-protein)'
-            },
-            {
-                key: 'sodium',
-                icon: '🧂',
-                name: '鈉',
-                unit: 'mg',
-                color: 'var(--color-sodium)'
-            },
-            {
-                key: 'water',
-                icon: '💧',
-                name: '水分',
-                unit: 'ml',
-                color: 'var(--color-water)'
-            }
-        ];
+  function renderStats(totals) {
+    const nutrients = [
+      {
+        key: 'calories',
+        icon: '🔥',
+        name: '熱量',
+        unit: 'kcal',
+        color: 'var(--color-calories)'
+      },
+      {
+        key: 'protein',
+        icon: '💪',
+        name: '蛋白質',
+        unit: 'g',
+        color: 'var(--color-protein)'
+      },
+      {
+        key: 'sodium',
+        icon: '🧂',
+        name: '鈉',
+        unit: 'mg',
+        color: 'var(--color-sodium)'
+      },
+      {
+        key: 'water',
+        icon: '💧',
+        name: '水分',
+        unit: 'ml',
+        color: 'var(--color-water)'
+      }
+    ];
 
-        statsContainer.innerHTML = `
+    statsContainer.innerHTML = `
       <div class="nutrient-grid">
         ${nutrients.map(n => {
-            const current = totals[n.key] || 0;
-            const target = targets[n.key] || 1;
-            const percent = calculatePercentage(current, target);
+      const current = totals[n.key] || 0;
+      const target = targets[n.key] || 1;
+      const percent = calculatePercentage(current, target);
 
-            return `
+      return `
             <div class="nutrient-card ${n.key}">
               <div class="progress-ring-container">
                 <svg class="progress-ring" width="80" height="80">
@@ -133,26 +138,26 @@ export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings }) {
               <div class="nutrient-name">${n.name}</div>
             </div>
           `;
-        }).join('')}
+    }).join('')}
       </div>
     `;
-    }
+  }
 
-    function renderFoodList(entries) {
-        if (entries.length === 0) {
-            foodListContainer.innerHTML = `
+  function renderFoodList(entries) {
+    if (entries.length === 0) {
+      foodListContainer.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">🍽️</div>
           <p class="empty-state-text">還沒有記錄<br>點擊下方按鈕新增食物</p>
         </div>
       `;
-            return;
-        }
+      return;
+    }
 
-        // Sort by time descending
-        entries.sort((a, b) => b.time.localeCompare(a.time));
+    // Sort by time descending
+    entries.sort((a, b) => b.time.localeCompare(a.time));
 
-        foodListContainer.innerHTML = `
+    foodListContainer.innerHTML = `
       <div class="food-list">
         ${entries.map(entry => `
           <div class="food-item" data-id="${entry.id}">
@@ -168,48 +173,48 @@ export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings }) {
       </div>
     `;
 
-        // Delete handlers
-        foodListContainer.querySelectorAll('.food-delete').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                const entryId = btn.dataset.id;
+    // Delete handlers
+    foodListContainer.querySelectorAll('.food-delete').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const entryId = btn.dataset.id;
 
-                if (confirm('確定要刪除這筆記錄嗎？')) {
-                    try {
-                        await deleteFoodEntry(today, entryId);
-                        loadData();
-                        showToast('已刪除');
-                    } catch (error) {
-                        showToast('刪除失敗', 'error');
-                    }
-                }
-            });
-        });
-    }
+        if (confirm('確定要刪除這筆記錄嗎？')) {
+          try {
+            await deleteFoodEntry(today, entryId);
+            loadData();
+            showToast('已刪除');
+          } catch (error) {
+            showToast('刪除失敗', 'error');
+          }
+        }
+      });
+    });
+  }
 
-    // Initial load
-    loadData();
+  // Initial load
+  loadData();
 
-    // Expose refresh method
-    container.refresh = loadData;
+  // Expose refresh method
+  container.refresh = loadData;
 
-    return container;
+  return container;
 }
 
 function showToast(message, type = 'success') {
-    let toastContainer = document.querySelector('.toast-container');
-    if (!toastContainer) {
-        toastContainer = document.createElement('div');
-        toastContainer.className = 'toast-container';
-        document.body.appendChild(toastContainer);
-    }
+  let toastContainer = document.querySelector('.toast-container');
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container';
+    document.body.appendChild(toastContainer);
+  }
 
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    toastContainer.appendChild(toast);
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  toastContainer.appendChild(toast);
 
-    setTimeout(() => {
-        toast.remove();
-    }, 3000);
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
 }

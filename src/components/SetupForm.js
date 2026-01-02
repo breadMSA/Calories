@@ -4,24 +4,24 @@ import { calculateRecommendedTargets, formatNumber } from '../utils/calculator.j
 import { saveUserProfile, getUserProfile } from '../utils/api.js';
 
 export function SetupForm({ onComplete, existingProfile = null }) {
-    const container = document.createElement('div');
-    container.className = 'page';
+  const container = document.createElement('div');
+  container.className = 'page';
 
-    const isEditing = !!existingProfile;
-    const defaults = existingProfile || {
-        height: 170,
-        weight: 65,
-        age: 25,
-        gender: 'male',
-        targets: null
-    };
+  const isEditing = !!existingProfile;
+  const defaults = existingProfile || {
+    height: 170,
+    weight: 65,
+    age: 25,
+    gender: 'male',
+    targets: null
+  };
 
-    container.innerHTML = `
+  container.innerHTML = `
     <div class="container">
       <div class="text-center mb-lg" style="padding-top: var(--space-xl);">
         <div style="font-size: 64px; margin-bottom: var(--space-md);">🥗</div>
         <h1>${isEditing ? '編輯個人資料' : '歡迎使用'}</h1>
-        <p class="text-muted mt-md">${isEditing ? '調整您的基本資料與目標' : '設定您的基本資料開始追蹤'}</p>
+        <p class="text-muted mt-md">${isEditing ? '調整你的基本資料與目標' : '設定你的基本資料開始追蹤'}</p>
       </div>
       
       <div class="card">
@@ -71,7 +71,7 @@ export function SetupForm({ onComplete, existingProfile = null }) {
         </div>
         
         <p class="text-muted mb-lg" style="font-size: var(--font-size-sm);">
-          根據您的資料自動計算，也可手動調整
+          根據你的資料自動計算，也可手動調整
         </p>
         
         <div class="form-row">
@@ -123,119 +123,119 @@ export function SetupForm({ onComplete, existingProfile = null }) {
     </div>
   `;
 
-    // Elements
-    const genderTabs = container.querySelector('#gender-tabs');
-    const heightInput = container.querySelector('#height');
-    const weightInput = container.querySelector('#weight');
-    const ageInput = container.querySelector('#age');
-    const caloriesInput = container.querySelector('#target-calories');
-    const proteinInput = container.querySelector('#target-protein');
-    const sodiumInput = container.querySelector('#target-sodium');
-    const waterInput = container.querySelector('#target-water');
-    const calculateBtn = container.querySelector('#calculate-btn');
-    const saveBtn = container.querySelector('#save-btn');
-    const cancelBtn = container.querySelector('#cancel-btn');
+  // Elements
+  const genderTabs = container.querySelector('#gender-tabs');
+  const heightInput = container.querySelector('#height');
+  const weightInput = container.querySelector('#weight');
+  const ageInput = container.querySelector('#age');
+  const caloriesInput = container.querySelector('#target-calories');
+  const proteinInput = container.querySelector('#target-protein');
+  const sodiumInput = container.querySelector('#target-sodium');
+  const waterInput = container.querySelector('#target-water');
+  const calculateBtn = container.querySelector('#calculate-btn');
+  const saveBtn = container.querySelector('#save-btn');
+  const cancelBtn = container.querySelector('#cancel-btn');
 
-    let currentGender = defaults.gender;
+  let currentGender = defaults.gender;
 
-    // Calculate and update targets
-    function updateTargets() {
-        const profile = {
-            height: parseFloat(heightInput.value) || 170,
-            weight: parseFloat(weightInput.value) || 65,
-            age: parseInt(ageInput.value) || 25,
-            gender: currentGender
-        };
+  // Calculate and update targets
+  function updateTargets() {
+    const profile = {
+      height: parseFloat(heightInput.value) || 170,
+      weight: parseFloat(weightInput.value) || 65,
+      age: parseInt(ageInput.value) || 25,
+      gender: currentGender
+    };
 
-        const targets = calculateRecommendedTargets(profile);
-        caloriesInput.value = targets.calories;
-        proteinInput.value = targets.protein;
-        sodiumInput.value = targets.sodium;
-        waterInput.value = targets.water;
-    }
+    const targets = calculateRecommendedTargets(profile);
+    caloriesInput.value = targets.calories;
+    proteinInput.value = targets.protein;
+    sodiumInput.value = targets.sodium;
+    waterInput.value = targets.water;
+  }
 
-    // Initialize targets
-    if (defaults.targets) {
-        caloriesInput.value = defaults.targets.calories;
-        proteinInput.value = defaults.targets.protein;
-        sodiumInput.value = defaults.targets.sodium;
-        waterInput.value = defaults.targets.water;
-    } else {
-        updateTargets();
-    }
+  // Initialize targets
+  if (defaults.targets) {
+    caloriesInput.value = defaults.targets.calories;
+    proteinInput.value = defaults.targets.protein;
+    sodiumInput.value = defaults.targets.sodium;
+    waterInput.value = defaults.targets.water;
+  } else {
+    updateTargets();
+  }
 
-    // Gender tab switching
-    genderTabs.addEventListener('click', (e) => {
-        const tab = e.target.closest('.tab');
-        if (!tab) return;
+  // Gender tab switching
+  genderTabs.addEventListener('click', (e) => {
+    const tab = e.target.closest('.tab');
+    if (!tab) return;
 
-        genderTabs.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        currentGender = tab.dataset.value;
-        updateTargets();
-    });
+    genderTabs.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentGender = tab.dataset.value;
+    updateTargets();
+  });
 
-    // Recalculate button
-    calculateBtn.addEventListener('click', updateTargets);
+  // Recalculate button
+  calculateBtn.addEventListener('click', updateTargets);
 
-    // Auto-recalculate on input change
-    [heightInput, weightInput, ageInput].forEach(input => {
-        input.addEventListener('change', updateTargets);
-    });
+  // Auto-recalculate on input change
+  [heightInput, weightInput, ageInput].forEach(input => {
+    input.addEventListener('change', updateTargets);
+  });
 
-    // Save button
-    saveBtn.addEventListener('click', async () => {
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; border-width: 2px;"></div> 儲存中...';
+  // Save button
+  saveBtn.addEventListener('click', async () => {
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; border-width: 2px;"></div> 儲存中...';
 
-        try {
-            const profile = {
-                height: parseFloat(heightInput.value),
-                weight: parseFloat(weightInput.value),
-                age: parseInt(ageInput.value),
-                gender: currentGender,
-                targets: {
-                    calories: parseInt(caloriesInput.value),
-                    protein: parseInt(proteinInput.value),
-                    sodium: parseInt(sodiumInput.value),
-                    water: parseInt(waterInput.value)
-                }
-            };
-
-            await saveUserProfile(profile);
-            onComplete(profile);
-        } catch (error) {
-            console.error('Save error:', error);
-            showToast('儲存失敗，請稍後再試', 'error');
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = isEditing ? '💾 儲存變更' : '🚀 開始使用';
+    try {
+      const profile = {
+        height: parseFloat(heightInput.value),
+        weight: parseFloat(weightInput.value),
+        age: parseInt(ageInput.value),
+        gender: currentGender,
+        targets: {
+          calories: parseInt(caloriesInput.value),
+          protein: parseInt(proteinInput.value),
+          sodium: parseInt(sodiumInput.value),
+          water: parseInt(waterInput.value)
         }
-    });
+      };
 
-    // Cancel button
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => {
-            onComplete(null);
-        });
+      await saveUserProfile(profile);
+      onComplete(profile);
+    } catch (error) {
+      console.error('Save error:', error);
+      showToast('儲存失敗，請稍後再試', 'error');
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = isEditing ? '💾 儲存變更' : '🚀 開始使用';
     }
+  });
 
-    return container;
+  // Cancel button
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      onComplete(null);
+    });
+  }
+
+  return container;
 }
 
 function showToast(message, type = 'success') {
-    let toastContainer = document.querySelector('.toast-container');
-    if (!toastContainer) {
-        toastContainer = document.createElement('div');
-        toastContainer.className = 'toast-container';
-        document.body.appendChild(toastContainer);
-    }
+  let toastContainer = document.querySelector('.toast-container');
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container';
+    document.body.appendChild(toastContainer);
+  }
 
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    toastContainer.appendChild(toast);
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  toastContainer.appendChild(toast);
 
-    setTimeout(() => {
-        toast.remove();
-    }, 3000);
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
 }
