@@ -10,6 +10,7 @@ export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings, onWe
   const today = getTodayDate();
   const targets = profile.targets;
   let currentEntries = [];
+  let fabMenuOpen = false;
 
   container.innerHTML = `
     <div class="container">
@@ -54,12 +55,20 @@ export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings, onWe
       </div>
     </div>
     
+    <!-- FAB with Menu -->
     <div class="fab-container">
-      <button class="fab fab-secondary" id="photo-btn" title="拍照分析">
-        📷
-      </button>
-      <button class="fab" id="add-btn" title="手動新增">
-        ➕
+      <div class="fab-menu hidden" id="fab-menu">
+        <button class="fab-menu-item" id="photo-btn">
+          <span class="fab-menu-icon">📷</span>
+          <span class="fab-menu-label">拍照分析</span>
+        </button>
+        <button class="fab-menu-item" id="manual-btn">
+          <span class="fab-menu-icon">✏️</span>
+          <span class="fab-menu-label">手動輸入</span>
+        </button>
+      </div>
+      <button class="fab" id="add-btn" title="新增食物">
+        <span id="fab-icon">➕</span>
       </button>
     </div>
   `;
@@ -69,7 +78,10 @@ export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings, onWe
   const settingsBtn = container.querySelector('#settings-btn');
   const summaryBtn = container.querySelector('#summary-btn');
   const addBtn = container.querySelector('#add-btn');
+  const fabMenu = container.querySelector('#fab-menu');
+  const fabIcon = container.querySelector('#fab-icon');
   const photoBtn = container.querySelector('#photo-btn');
+  const manualBtn = container.querySelector('#manual-btn');
   const nutrientModal = container.querySelector('#nutrient-modal');
   const nutrientModalClose = container.querySelector('#nutrient-modal-close');
   const nutrientModalTitle = container.querySelector('#nutrient-modal-title');
@@ -78,8 +90,31 @@ export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings, onWe
   // Event listeners
   settingsBtn.addEventListener('click', onSettings);
   summaryBtn.addEventListener('click', onWeeklySummary);
-  addBtn.addEventListener('click', onAddFood);
-  photoBtn.addEventListener('click', onPhotoAnalyze);
+
+  // FAB menu toggle
+  addBtn.addEventListener('click', () => {
+    fabMenuOpen = !fabMenuOpen;
+    fabMenu.classList.toggle('hidden', !fabMenuOpen);
+    fabIcon.textContent = fabMenuOpen ? '✕' : '➕';
+    addBtn.classList.toggle('active', fabMenuOpen);
+  });
+
+  photoBtn.addEventListener('click', () => {
+    closeFabMenu();
+    onPhotoAnalyze();
+  });
+
+  manualBtn.addEventListener('click', () => {
+    closeFabMenu();
+    onAddFood();
+  });
+
+  function closeFabMenu() {
+    fabMenuOpen = false;
+    fabMenu.classList.add('hidden');
+    fabIcon.textContent = '➕';
+    addBtn.classList.remove('active');
+  }
 
   // Nutrient modal close
   nutrientModalClose.addEventListener('click', () => nutrientModal.classList.add('hidden'));
@@ -217,21 +252,23 @@ export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings, onWe
     foodListContainer.innerHTML = `
       <div class="food-list">
         ${entries.map(entry => `
-          <div class="food-item" data-id="${entry.id}">
-            <div class="food-icon">${entry.source === 'ai' ? '🤖' : '✏️'}</div>
-            <div class="food-info">
-              <div class="food-name">${entry.name}</div>
-              <div class="food-meta">${entry.time}</div>
+          <div class="food-item-v2" data-id="${entry.id}">
+            <div class="food-item-main">
+              <div class="food-icon">${entry.source === 'ai' ? '🤖' : '✏️'}</div>
+              <div class="food-info">
+                <div class="food-name">${entry.name}</div>
+                <div class="food-meta">${entry.time}</div>
+              </div>
+              <div class="food-actions">
+                <button class="food-edit" data-id="${entry.id}" title="編輯">✏️</button>
+                <button class="food-delete" data-id="${entry.id}" title="刪除">🗑️</button>
+              </div>
             </div>
-            <div class="food-nutrients-compact">
-              <span class="nutrient-tag calories">🔥${entry.calories}</span>
-              <span class="nutrient-tag protein">💪${entry.protein}g</span>
-              <span class="nutrient-tag sodium">🧂${entry.sodium}mg</span>
-              <span class="nutrient-tag water">💧${entry.water}ml</span>
-            </div>
-            <div class="food-actions">
-              <button class="food-edit" data-id="${entry.id}" title="編輯">✏️</button>
-              <button class="food-delete" data-id="${entry.id}" title="刪除">🗑️</button>
+            <div class="food-nutrients-row">
+              <span class="nutrient-pill calories">🔥 ${entry.calories} kcal</span>
+              <span class="nutrient-pill protein">💪 ${entry.protein}g</span>
+              <span class="nutrient-pill sodium">🧂 ${entry.sodium}mg</span>
+              <span class="nutrient-pill water">💧 ${entry.water}ml</span>
             </div>
           </div>
         `).join('')}

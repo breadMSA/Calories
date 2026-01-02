@@ -517,12 +517,104 @@ h4 {
   transform: scale(0.95);
 }
 
-.fab-secondary {
-  width: 48px;
-  height: 48px;
-  font-size: 20px;
-  background: var(--bg-secondary);
+.fab.active {
+  transform: rotate(45deg);
+  background: var(--bg-tertiary);
   box-shadow: var(--shadow-md);
+}
+
+.fab-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  animation: fadeIn var(--transition-fast);
+}
+
+.fab-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+  white-space: nowrap;
+}
+
+.fab-menu-item:hover {
+  background: var(--bg-tertiary);
+  transform: translateX(-4px);
+}
+
+.fab-menu-icon {
+  font-size: 18px;
+}
+
+.fab-menu-label {
+  font-weight: 500;
+}
+
+/* ===== Food Item V2 (New Layout) ===== */
+.food-item-v2 {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  margin-bottom: var(--space-sm);
+  transition: background var(--transition-fast);
+}
+
+.food-item-v2:hover {
+  background: rgba(51, 65, 85, 0.8);
+}
+
+.food-item-main {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.food-nutrients-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  padding-left: calc(40px + var(--space-md));
+}
+
+.nutrient-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+.nutrient-pill.calories {
+  background: var(--color-calories-bg);
+  color: var(--color-calories);
+}
+
+.nutrient-pill.protein {
+  background: var(--color-protein-bg);
+  color: var(--color-protein);
+}
+
+.nutrient-pill.sodium {
+  background: var(--color-sodium-bg);
+  color: var(--color-sodium);
+}
+
+.nutrient-pill.water {
+  background: var(--color-water-bg);
+  color: var(--color-water);
 }
 
 /* ===== Modal ===== */
