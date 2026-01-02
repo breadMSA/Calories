@@ -5,7 +5,7 @@ import { SetupForm } from './components/SetupForm.js';
 import { Dashboard } from './components/Dashboard.js';
 import { FoodEntry } from './components/FoodEntry.js';
 import { PhotoAnalyzer } from './components/PhotoAnalyzer.js';
-import { WeeklySummary } from './components/WeeklySummary.js';
+import { CalendarSummary } from './components/CalendarSummary.js';
 import { getUserProfile } from './utils/api.js';
 
 class App {
@@ -104,7 +104,7 @@ class App {
   }
 
   showWeeklySummary() {
-    const modal = WeeklySummary({
+    const modal = CalendarSummary({
       profile: this.profile,
       onClose: () => { }
     });

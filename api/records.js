@@ -74,12 +74,10 @@ export default async function handler(req, res) {
 
             await kv.set(recordKey, record);
 
-            // Update index
+            // Update index (store all dates, no limit)
             const index = await kv.get('records:index') || [];
             if (!index.includes(entry.date)) {
                 index.unshift(entry.date);
-                // Keep only last 365 days
-                if (index.length > 365) index.pop();
                 await kv.set('records:index', index);
             }
 

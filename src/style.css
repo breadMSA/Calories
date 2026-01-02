@@ -1248,6 +1248,368 @@ h4 {
   background: rgba(239, 68, 68, 0.2);
 }
 
+/* ===== Calendar Summary ===== */
+.calendar-modal {
+  max-height: 95vh;
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--bg-tertiary);
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.nav-arrow:hover {
+  background: var(--accent-green);
+  color: white;
+}
+
+.nav-title {
+  font-weight: 600;
+  min-width: 150px;
+  text-align: center;
+}
+
+.view-tabs {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.view-tab {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: 1px solid var(--bg-tertiary);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.view-tab:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.view-tab.active {
+  background: var(--accent-green);
+  border-color: var(--accent-green);
+  color: white;
+}
+
+/* Day View */
+.day-view {
+  padding: var(--space-sm);
+}
+
+.day-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.day-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  border-left: 3px solid transparent;
+}
+
+.day-stat.met {
+  border-left-color: #10B981;
+}
+
+.day-stat.not-met {
+  border-left-color: #EF4444;
+}
+
+.day-stat-icon {
+  font-size: 24px;
+}
+
+.day-stat-info {
+  flex: 1;
+}
+
+.day-stat-name {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.day-stat-value {
+  font-weight: 600;
+}
+
+.day-stat-bar {
+  height: 4px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-full);
+  margin-top: var(--space-xs);
+  overflow: hidden;
+}
+
+.day-stat-fill {
+  height: 100%;
+  background: var(--accent-green);
+  border-radius: var(--radius-full);
+}
+
+.day-stat-pct {
+  font-weight: 700;
+  min-width: 45px;
+  text-align: right;
+}
+
+.food-list-mini {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.food-mini {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+}
+
+.food-mini span {
+  color: var(--text-muted);
+  margin-left: var(--space-sm);
+}
+
+/* Week View */
+.week-view {
+  padding: var(--space-sm);
+}
+
+.week-stats {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.week-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  min-width: 60px;
+}
+
+.week-stat.good {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.week-stat.ok {
+  background: rgba(251, 191, 36, 0.2);
+}
+
+.week-stat.bad {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.week-stat-val {
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+}
+
+.week-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.week-table th,
+.week-table td {
+  padding: var(--space-sm);
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.week-table th {
+  font-size: var(--font-size-lg);
+}
+
+.week-table tr.today {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.week-date {
+  text-align: left !important;
+}
+
+.week-day {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+.week-num {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+/* Month View */
+.month-view {
+  padding: var(--space-sm);
+}
+
+.month-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-top: var(--space-xs);
+}
+
+.month-cell {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  background: var(--bg-tertiary);
+}
+
+.month-cell.empty {
+  background: transparent;
+}
+
+.month-cell.good {
+  background: rgba(16, 185, 129, 0.3);
+}
+
+.month-cell.ok {
+  background: rgba(251, 191, 36, 0.3);
+}
+
+.month-cell.bad {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+.month-cell.today {
+  border: 2px solid var(--accent-green);
+}
+
+.month-day {
+  font-weight: 600;
+}
+
+.month-score {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.month-legend {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 4px;
+}
+
+.dot.good {
+  background: rgba(16, 185, 129, 0.5);
+}
+
+.dot.ok {
+  background: rgba(251, 191, 36, 0.5);
+}
+
+.dot.bad {
+  background: rgba(239, 68, 68, 0.5);
+}
+
+/* Year View */
+.year-view {
+  padding: var(--space-sm);
+}
+
+.year-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-sm);
+}
+
+.year-month {
+  padding: var(--space-md);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.year-month.good {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.year-month.ok {
+  background: rgba(251, 191, 36, 0.2);
+}
+
+.year-month.bad {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.year-month.current {
+  border: 2px solid var(--accent-green);
+}
+
+.year-month-name {
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+}
+
+.year-month-pct {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+}
+
 /* ===== Utilities ===== */
 .hidden {
   display: none !important;
