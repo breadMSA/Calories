@@ -75,6 +75,16 @@ export async function deleteFoodEntry(date, entryId) {
     });
 }
 
+/**
+ * Update a food entry
+ */
+export async function updateFoodEntry(entry) {
+    return request('/records', {
+        method: 'PUT',
+        body: JSON.stringify(entry)
+    });
+}
+
 // ===== AI Analysis API =====
 
 /**

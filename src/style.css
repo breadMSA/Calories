@@ -962,6 +962,200 @@ h4 {
   border-radius: var(--radius-md);
 }
 
+/* Clickable rows */
+.clickable-row {
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.clickable-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.clickable {
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.clickable:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-md);
+}
+
+/* Day Detail View */
+.day-detail {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.detail-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+}
+
+.detail-icon {
+  font-size: 28px;
+}
+
+.detail-info {
+  flex: 1;
+}
+
+.detail-name {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.detail-value {
+  font-weight: 600;
+}
+
+.detail-bar {
+  height: 6px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-full);
+  margin-top: var(--space-xs);
+  overflow: hidden;
+}
+
+.detail-bar-fill {
+  height: 100%;
+  background: var(--accent-green);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-slow);
+}
+
+.detail-percent {
+  font-weight: 700;
+  color: var(--text-secondary);
+  min-width: 50px;
+  text-align: right;
+}
+
+/* Nutrient Breakdown */
+.nutrient-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+}
+
+.breakdown-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.breakdown-name {
+  font-weight: 500;
+}
+
+.breakdown-time {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.breakdown-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.breakdown-number {
+  font-weight: 600;
+}
+
+.breakdown-percent {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.breakdown-total {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  border: 1px solid var(--accent-green);
+}
+
+/* Compact Nutrient Tags */
+.food-nutrients-compact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  font-size: var(--font-size-xs);
+}
+
+.nutrient-tag {
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+}
+
+.nutrient-tag.calories {
+  color: var(--color-calories);
+}
+
+.nutrient-tag.protein {
+  color: var(--color-protein);
+}
+
+.nutrient-tag.sodium {
+  color: var(--color-sodium);
+}
+
+.nutrient-tag.water {
+  color: var(--color-water);
+}
+
+/* Food Actions */
+.food-actions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.food-edit,
+.food-delete {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  font-size: 14px;
+}
+
+.food-edit:hover {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.food-delete:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
 /* ===== Utilities ===== */
 .hidden {
   display: none !important;

@@ -4,7 +4,7 @@ import { kv } from '@vercel/kv';
 export default async function handler(req, res) {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') {
@@ -82,6 +82,51 @@ export default async function handler(req, res) {
                 if (index.length > 365) index.pop();
                 await kv.set('records:index', index);
             }
+
+            return res.status(200).json(record);
+        }
+
+        if (req.method === 'PUT') {
+            // Update an existing food entry
+            const entry = req.body;
+
+            if (!entry || !entry.date || !entry.id) {
+                return res.status(400).json({ error: 'Invalid entry data' });
+            }
+
+            const recordKey = `records:${entry.date}`;
+            let record = await kv.get(recordKey);
+
+            if (!record) {
+                return res.status(404).json({ error: 'Record not found' });
+            }
+
+            // Find and update the entry
+            const entryIndex = record.entries.findIndex(e => e.id === entry.id);
+            if (entryIndex === -1) {
+                return res.status(404).json({ error: 'Entry not found' });
+            }
+
+            record.entries[entryIndex] = {
+                id: entry.id,
+                time: entry.time,
+                name: entry.name,
+                calories: entry.calories || 0,
+                protein: entry.protein || 0,
+                sodium: entry.sodium || 0,
+                water: entry.water || 0,
+                source: entry.source || 'manual'
+            };
+
+            // Recalculate totals
+            record.totals = record.entries.reduce((acc, e) => ({
+                calories: acc.calories + (e.calories || 0),
+                protein: acc.protein + (e.protein || 0),
+                sodium: acc.sodium + (e.sodium || 0),
+                water: acc.water + (e.water || 0)
+            }), { calories: 0, protein: 0, sodium: 0, water: 0 });
+
+            await kv.set(recordKey, record);
 
             return res.status(200).json(record);
         }

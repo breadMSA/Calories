@@ -68,15 +68,17 @@ class App {
       onAddFood: () => this.showFoodEntry(),
       onPhotoAnalyze: () => this.showPhotoAnalyzer(),
       onSettings: () => this.showSetup(this.profile),
-      onWeeklySummary: () => this.showWeeklySummary()
+      onWeeklySummary: () => this.showWeeklySummary(),
+      onEditFood: (entry) => this.showFoodEntry(entry)
     });
 
     this.app.appendChild(dashboard);
     this.currentPage = dashboard;
   }
 
-  showFoodEntry() {
+  showFoodEntry(editEntry = null) {
     const modal = FoodEntry({
+      editEntry: editEntry,
       onClose: () => { },
       onSave: () => {
         if (this.currentPage && this.currentPage.refresh) {

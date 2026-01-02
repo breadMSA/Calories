@@ -3,13 +3,13 @@
 import { analyzeFood, addFoodEntry, getTodayDate, getCurrentTime, generateId } from '../utils/api.js';
 
 export function PhotoAnalyzer({ onClose, onSave }) {
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
 
-    let currentImageBase64 = null;
-    let analysisResult = null;
+  let currentImageBase64 = null;
+  let analysisResult = null;
 
-    overlay.innerHTML = `
+  overlay.innerHTML = `
     <div class="modal">
       <div class="modal-header">
         <h2 class="modal-title">📷 AI 食物分析</h2>
@@ -86,143 +86,152 @@ export function PhotoAnalyzer({ onClose, onSave }) {
     </div>
   `;
 
-    // Elements
-    const closeBtn = overlay.querySelector('#close-btn');
-    const cancelBtn = overlay.querySelector('#cancel-btn');
-    const saveBtn = overlay.querySelector('#save-btn');
-    const photoUpload = overlay.querySelector('#photo-upload');
-    const photoInput = overlay.querySelector('#photo-input');
-    const uploadSection = overlay.querySelector('#upload-section');
-    const previewSection = overlay.querySelector('#preview-section');
-    const previewImage = overlay.querySelector('#preview-image');
-    const loadingSection = overlay.querySelector('#loading-section');
-    const resultSection = overlay.querySelector('#result-section');
-    const errorSection = overlay.querySelector('#error-section');
-    const retryBtn = overlay.querySelector('#retry-btn');
+  // Elements
+  const closeBtn = overlay.querySelector('#close-btn');
+  const cancelBtn = overlay.querySelector('#cancel-btn');
+  const saveBtn = overlay.querySelector('#save-btn');
+  const photoUpload = overlay.querySelector('#photo-upload');
+  const photoInput = overlay.querySelector('#photo-input');
+  const uploadSection = overlay.querySelector('#upload-section');
+  const previewSection = overlay.querySelector('#preview-section');
+  const previewImage = overlay.querySelector('#preview-image');
+  const loadingSection = overlay.querySelector('#loading-section');
+  const resultSection = overlay.querySelector('#result-section');
+  const errorSection = overlay.querySelector('#error-section');
+  const retryBtn = overlay.querySelector('#retry-btn');
 
-    // Result elements
-    const resultName = overlay.querySelector('#result-name');
-    const resultCalories = overlay.querySelector('#result-calories');
-    const resultProtein = overlay.querySelector('#result-protein');
-    const resultSodium = overlay.querySelector('#result-sodium');
-    const resultWater = overlay.querySelector('#result-water');
-    const errorMessage = overlay.querySelector('#error-message');
+  // Result elements
+  const resultName = overlay.querySelector('#result-name');
+  const resultCalories = overlay.querySelector('#result-calories');
+  const resultProtein = overlay.querySelector('#result-protein');
+  const resultSodium = overlay.querySelector('#result-sodium');
+  const resultWater = overlay.querySelector('#result-water');
+  const errorMessage = overlay.querySelector('#error-message');
 
-    // Close handlers
-    const close = () => {
-        overlay.remove();
-        onClose();
+  // Close handlers
+  const close = () => {
+    document.removeEventListener('keydown', handleKeyDown);
+    overlay.remove();
+    onClose();
+  };
+
+  // ESC key handler
+  function handleKeyDown(e) {
+    if (e.key === 'Escape') {
+      close();
+    }
+  }
+  document.addEventListener('keydown', handleKeyDown);
+
+  closeBtn.addEventListener('click', close);
+  cancelBtn.addEventListener('click', close);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) close();
+  });
+
+  // Photo selection
+  photoUpload.addEventListener('click', () => photoInput.click());
+
+  photoInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64 = e.target.result;
+      currentImageBase64 = base64.split(',')[1]; // Remove data:image/...;base64, prefix
+      previewImage.src = base64;
+
+      uploadSection.classList.add('hidden');
+      previewSection.classList.remove('hidden');
+      loadingSection.classList.remove('hidden');
+      resultSection.classList.add('hidden');
+      errorSection.classList.add('hidden');
+      saveBtn.classList.add('hidden');
+
+      // Analyze
+      try {
+        const result = await analyzeFood(currentImageBase64);
+        analysisResult = result;
+
+        resultName.textContent = result.name || '未知食物';
+        resultCalories.textContent = result.calories || 0;
+        resultProtein.textContent = result.protein || 0;
+        resultSodium.textContent = result.sodium || 0;
+        resultWater.textContent = result.water || 0;
+
+        loadingSection.classList.add('hidden');
+        resultSection.classList.remove('hidden');
+        saveBtn.classList.remove('hidden');
+      } catch (error) {
+        console.error('Analysis error:', error);
+        loadingSection.classList.add('hidden');
+        errorSection.classList.remove('hidden');
+        errorMessage.textContent = error.message || '分析失敗，請重試';
+      }
     };
+    reader.readAsDataURL(file);
+  });
 
-    closeBtn.addEventListener('click', close);
-    cancelBtn.addEventListener('click', close);
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) close();
-    });
+  // Retry
+  retryBtn.addEventListener('click', () => {
+    uploadSection.classList.remove('hidden');
+    previewSection.classList.add('hidden');
+    photoInput.value = '';
+    currentImageBase64 = null;
+    analysisResult = null;
+  });
 
-    // Photo selection
-    photoUpload.addEventListener('click', () => photoInput.click());
+  // Save
+  saveBtn.addEventListener('click', async () => {
+    if (!analysisResult) return;
 
-    photoInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; border-width: 2px;"></div>';
 
-        // Show preview
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            const base64 = e.target.result;
-            currentImageBase64 = base64.split(',')[1]; // Remove data:image/...;base64, prefix
-            previewImage.src = base64;
+    try {
+      const entry = {
+        id: generateId(),
+        date: getTodayDate(),
+        time: getCurrentTime(),
+        name: analysisResult.name || '未知食物',
+        calories: analysisResult.calories || 0,
+        protein: analysisResult.protein || 0,
+        sodium: analysisResult.sodium || 0,
+        water: analysisResult.water || 0,
+        source: 'ai'
+      };
 
-            uploadSection.classList.add('hidden');
-            previewSection.classList.remove('hidden');
-            loadingSection.classList.remove('hidden');
-            resultSection.classList.add('hidden');
-            errorSection.classList.add('hidden');
-            saveBtn.classList.add('hidden');
+      await addFoodEntry(entry);
+      showToast('已新增食物記錄');
+      overlay.remove();
+      onSave();
+    } catch (error) {
+      console.error('Save error:', error);
+      showToast('新增失敗，請稍後再試', 'error');
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '✓ 加入今日記錄';
+    }
+  });
 
-            // Analyze
-            try {
-                const result = await analyzeFood(currentImageBase64);
-                analysisResult = result;
-
-                resultName.textContent = result.name || '未知食物';
-                resultCalories.textContent = result.calories || 0;
-                resultProtein.textContent = result.protein || 0;
-                resultSodium.textContent = result.sodium || 0;
-                resultWater.textContent = result.water || 0;
-
-                loadingSection.classList.add('hidden');
-                resultSection.classList.remove('hidden');
-                saveBtn.classList.remove('hidden');
-            } catch (error) {
-                console.error('Analysis error:', error);
-                loadingSection.classList.add('hidden');
-                errorSection.classList.remove('hidden');
-                errorMessage.textContent = error.message || '分析失敗，請重試';
-            }
-        };
-        reader.readAsDataURL(file);
-    });
-
-    // Retry
-    retryBtn.addEventListener('click', () => {
-        uploadSection.classList.remove('hidden');
-        previewSection.classList.add('hidden');
-        photoInput.value = '';
-        currentImageBase64 = null;
-        analysisResult = null;
-    });
-
-    // Save
-    saveBtn.addEventListener('click', async () => {
-        if (!analysisResult) return;
-
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; border-width: 2px;"></div>';
-
-        try {
-            const entry = {
-                id: generateId(),
-                date: getTodayDate(),
-                time: getCurrentTime(),
-                name: analysisResult.name || '未知食物',
-                calories: analysisResult.calories || 0,
-                protein: analysisResult.protein || 0,
-                sodium: analysisResult.sodium || 0,
-                water: analysisResult.water || 0,
-                source: 'ai'
-            };
-
-            await addFoodEntry(entry);
-            showToast('已新增食物記錄');
-            overlay.remove();
-            onSave();
-        } catch (error) {
-            console.error('Save error:', error);
-            showToast('新增失敗，請稍後再試', 'error');
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = '✓ 加入今日記錄';
-        }
-    });
-
-    return overlay;
+  return overlay;
 }
 
 function showToast(message, type = 'success') {
-    let toastContainer = document.querySelector('.toast-container');
-    if (!toastContainer) {
-        toastContainer = document.createElement('div');
-        toastContainer.className = 'toast-container';
-        document.body.appendChild(toastContainer);
-    }
+  let toastContainer = document.querySelector('.toast-container');
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container';
+    document.body.appendChild(toastContainer);
+  }
 
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    toastContainer.appendChild(toast);
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  toastContainer.appendChild(toast);
 
-    setTimeout(() => {
-        toast.remove();
-    }, 3000);
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
 }

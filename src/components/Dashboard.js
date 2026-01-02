@@ -3,12 +3,13 @@
 import { getRecords, deleteFoodEntry, getTodayDate, formatDate } from '../utils/api.js';
 import { calculatePercentage, formatNumber } from '../utils/calculator.js';
 
-export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings, onWeeklySummary }) {
+export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings, onWeeklySummary, onEditFood }) {
   const container = document.createElement('div');
   container.className = 'page';
 
   const today = getTodayDate();
   const targets = profile.targets;
+  let currentEntries = [];
 
   container.innerHTML = `
     <div class="container">
@@ -42,6 +43,17 @@ export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings, onWe
       </div>
     </div>
     
+    <!-- Nutrient Breakdown Modal -->
+    <div class="modal-overlay hidden" id="nutrient-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 class="modal-title" id="nutrient-modal-title">營養素明細</h2>
+          <button class="modal-close" id="nutrient-modal-close">✕</button>
+        </div>
+        <div class="modal-body" id="nutrient-modal-body"></div>
+      </div>
+    </div>
+    
     <div class="fab-container">
       <button class="fab fab-secondary" id="photo-btn" title="拍照分析">
         📷
@@ -58,6 +70,10 @@ export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings, onWe
   const summaryBtn = container.querySelector('#summary-btn');
   const addBtn = container.querySelector('#add-btn');
   const photoBtn = container.querySelector('#photo-btn');
+  const nutrientModal = container.querySelector('#nutrient-modal');
+  const nutrientModalClose = container.querySelector('#nutrient-modal-close');
+  const nutrientModalTitle = container.querySelector('#nutrient-modal-title');
+  const nutrientModalBody = container.querySelector('#nutrient-modal-body');
 
   // Event listeners
   settingsBtn.addEventListener('click', onSettings);
@@ -65,14 +81,22 @@ export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings, onWe
   addBtn.addEventListener('click', onAddFood);
   photoBtn.addEventListener('click', onPhotoAnalyze);
 
+  // Nutrient modal close
+  nutrientModalClose.addEventListener('click', () => nutrientModal.classList.add('hidden'));
+  nutrientModal.addEventListener('click', (e) => {
+    if (e.target === nutrientModal) nutrientModal.classList.add('hidden');
+  });
+
   // Load and render data
   async function loadData() {
     try {
       const data = await getRecords(today);
+      currentEntries = data.entries || [];
       renderStats(data.totals || { calories: 0, protein: 0, sodium: 0, water: 0 });
-      renderFoodList(data.entries || []);
+      renderFoodList(currentEntries);
     } catch (error) {
       console.error('Load error:', error);
+      currentEntries = [];
       renderStats({ calories: 0, protein: 0, sodium: 0, water: 0 });
       renderFoodList([]);
     }
@@ -80,34 +104,10 @@ export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings, onWe
 
   function renderStats(totals) {
     const nutrients = [
-      {
-        key: 'calories',
-        icon: '🔥',
-        name: '熱量',
-        unit: 'kcal',
-        color: 'var(--color-calories)'
-      },
-      {
-        key: 'protein',
-        icon: '💪',
-        name: '蛋白質',
-        unit: 'g',
-        color: 'var(--color-protein)'
-      },
-      {
-        key: 'sodium',
-        icon: '🧂',
-        name: '鈉',
-        unit: 'mg',
-        color: 'var(--color-sodium)'
-      },
-      {
-        key: 'water',
-        icon: '💧',
-        name: '水分',
-        unit: 'ml',
-        color: 'var(--color-water)'
-      }
+      { key: 'calories', icon: '🔥', name: '熱量', unit: 'kcal', color: 'var(--color-calories)' },
+      { key: 'protein', icon: '💪', name: '蛋白質', unit: 'g', color: 'var(--color-protein)' },
+      { key: 'sodium', icon: '🧂', name: '鈉', unit: 'mg', color: 'var(--color-sodium)' },
+      { key: 'water', icon: '💧', name: '水分', unit: 'ml', color: 'var(--color-water)' }
     ];
 
     statsContainer.innerHTML = `
@@ -118,7 +118,7 @@ export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings, onWe
       const percent = calculatePercentage(current, target);
 
       return `
-            <div class="nutrient-card ${n.key}">
+            <div class="nutrient-card ${n.key} clickable" data-nutrient="${n.key}">
               <div class="progress-ring-container">
                 <svg class="progress-ring" width="80" height="80">
                   <circle class="progress-ring-bg" cx="40" cy="40" r="32" stroke-width="6"/>
@@ -141,6 +141,63 @@ export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings, onWe
     }).join('')}
       </div>
     `;
+
+    // Add click handlers for nutrient cards
+    statsContainer.querySelectorAll('.nutrient-card.clickable').forEach(card => {
+      card.addEventListener('click', () => {
+        const nutrientKey = card.dataset.nutrient;
+        showNutrientBreakdown(nutrientKey);
+      });
+    });
+  }
+
+  function showNutrientBreakdown(nutrientKey) {
+    const nutrientInfo = {
+      calories: { name: '熱量', icon: '🔥', unit: 'kcal' },
+      protein: { name: '蛋白質', icon: '💪', unit: 'g' },
+      sodium: { name: '鈉', icon: '🧂', unit: 'mg' },
+      water: { name: '水分', icon: '💧', unit: 'ml' }
+    };
+
+    const info = nutrientInfo[nutrientKey];
+    nutrientModalTitle.textContent = `${info.icon} ${info.name}明細`;
+
+    // Sort entries by this nutrient value
+    const sortedEntries = [...currentEntries].sort((a, b) => (b[nutrientKey] || 0) - (a[nutrientKey] || 0));
+    const total = sortedEntries.reduce((sum, e) => sum + (e[nutrientKey] || 0), 0);
+
+    nutrientModalBody.innerHTML = `
+      <div class="nutrient-breakdown">
+        ${sortedEntries.length === 0 ? `
+          <div class="empty-state">
+            <p class="empty-state-text">還沒有記錄</p>
+          </div>
+        ` : `
+          ${sortedEntries.map(entry => {
+      const value = entry[nutrientKey] || 0;
+      const percent = total > 0 ? Math.round((value / total) * 100) : 0;
+      return `
+              <div class="breakdown-item">
+                <div class="breakdown-info">
+                  <span class="breakdown-name">${entry.name}</span>
+                  <span class="breakdown-time">${entry.time}</span>
+                </div>
+                <div class="breakdown-value">
+                  <span class="breakdown-number">${formatNumber(value)} ${info.unit}</span>
+                  <span class="breakdown-percent">${percent}%</span>
+                </div>
+              </div>
+            `;
+    }).join('')}
+          <div class="breakdown-total">
+            <span>總計</span>
+            <span>${formatNumber(total)} ${info.unit}</span>
+          </div>
+        `}
+      </div>
+    `;
+
+    nutrientModal.classList.remove('hidden');
   }
 
   function renderFoodList(entries) {
@@ -166,12 +223,32 @@ export function Dashboard({ profile, onAddFood, onPhotoAnalyze, onSettings, onWe
               <div class="food-name">${entry.name}</div>
               <div class="food-meta">${entry.time}</div>
             </div>
-            <div class="food-calories">${formatNumber(entry.calories)} kcal</div>
-            <button class="food-delete" data-id="${entry.id}">✕</button>
+            <div class="food-nutrients-compact">
+              <span class="nutrient-tag calories">🔥${entry.calories}</span>
+              <span class="nutrient-tag protein">💪${entry.protein}g</span>
+              <span class="nutrient-tag sodium">🧂${entry.sodium}mg</span>
+              <span class="nutrient-tag water">💧${entry.water}ml</span>
+            </div>
+            <div class="food-actions">
+              <button class="food-edit" data-id="${entry.id}" title="編輯">✏️</button>
+              <button class="food-delete" data-id="${entry.id}" title="刪除">🗑️</button>
+            </div>
           </div>
         `).join('')}
       </div>
     `;
+
+    // Edit handlers
+    foodListContainer.querySelectorAll('.food-edit').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const entryId = btn.dataset.id;
+        const entry = entries.find(e => e.id === entryId);
+        if (entry && onEditFood) {
+          onEditFood(entry);
+        }
+      });
+    });
 
     // Delete handlers
     foodListContainer.querySelectorAll('.food-delete').forEach(btn => {
