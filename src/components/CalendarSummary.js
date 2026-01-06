@@ -197,6 +197,12 @@ export function CalendarSummary({ profile, onClose }) {
     return days[date.getDay()];
   }
 
+  // Get Monday index for week view ordering
+  function getMondayBasedIndex(date) {
+    const day = date.getDay();
+    return day === 0 ? 6 : day - 1; // Mon=0, Tue=1, ... Sun=6
+  }
+
   async function fetchData(dateStr) {
     if (cachedData[dateStr]) return cachedData[dateStr];
     try {
@@ -295,7 +301,10 @@ export function CalendarSummary({ profile, onClose }) {
 
   async function renderWeekView() {
     const startOfWeek = new Date(currentDate);
-    startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+    // Start on Monday instead of Sunday
+    const day = currentDate.getDay();
+    const diff = day === 0 ? -6 : 1 - day; // Sunday goes back 6 days
+    startOfWeek.setDate(currentDate.getDate() + diff);
 
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);

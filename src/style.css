@@ -1734,3 +1734,170 @@ h4 {
 .mt-lg {
   margin-top: var(--space-lg);
 }
+
+/* ===== Mode Selection (PhotoAnalyzer) ===== */
+.mode-selection {
+  padding: var(--space-md) 0;
+}
+
+.mode-hint {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-lg);
+  font-size: var(--font-size-sm);
+}
+
+.mode-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.mode-option {
+  background: var(--bg-tertiary);
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+  color: var(--text-primary);
+}
+
+.mode-option:hover {
+  border-color: var(--accent-green);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.mode-option:active {
+  transform: scale(0.98);
+}
+
+.mode-icon {
+  font-size: 40px;
+  margin-bottom: var(--space-md);
+}
+
+.mode-label {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+}
+
+.mode-desc {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+/* ===== Barcode Scanner ===== */
+.barcode-scanner-container {
+  margin-bottom: var(--space-lg);
+}
+
+.barcode-reader {
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-primary);
+  min-height: 250px;
+}
+
+.barcode-reader video {
+  width: 100%;
+  border-radius: var(--radius-md);
+}
+
+.barcode-hint {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-sm);
+}
+
+.barcode-manual {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: var(--space-lg);
+}
+
+.manual-hint {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-md);
+}
+
+.barcode-input-group {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.barcode-input-group .input {
+  flex: 1;
+  padding: var(--space-md);
+  background: var(--bg-tertiary);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: var(--font-size-lg);
+  color: var(--text-primary);
+  text-align: center;
+  letter-spacing: 2px;
+}
+
+.barcode-input-group .input:focus {
+  outline: none;
+  border-color: var(--accent-green);
+}
+
+.barcode-input-group .btn {
+  flex-shrink: 0;
+}
+
+/* Back Button */
+.back-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  padding: var(--space-sm) 0;
+  margin-bottom: var(--space-md);
+  transition: color var(--transition-fast);
+}
+
+.back-btn:hover {
+  color: var(--text-primary);
+}
+
+/* PhotoAnalyzer Modal Fixes */
+.photo-analyzer-modal .modal-body {
+  min-height: 300px;
+}
+
+.photo-analyzer-modal .photo-preview img {
+  max-height: 200px;
+  margin-bottom: var(--space-md);
+}
+
+/* Input utility class */
+.input {
+  padding: var(--space-md);
+  background: var(--bg-tertiary);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  transition: border-color var(--transition-fast);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent-green);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}

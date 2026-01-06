@@ -98,6 +98,14 @@ export async function analyzeFood(base64Image) {
     });
 }
 
+/**
+ * Search for food by barcode using Open Food Facts
+ * @param {string} barcode - Product barcode
+ */
+export async function searchByBarcode(barcode) {
+    return request(`/barcode?code=${barcode}`);
+}
+
 // ===== Helper Functions =====
 
 /**

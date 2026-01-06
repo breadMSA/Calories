@@ -50,13 +50,19 @@ export function WeeklySummary({ profile, onClose, onViewDay }) {
     if (e.target === overlay) close();
   });
 
-  // Get the last 7 days
+  // Get the current week (Monday to Sunday)
   function getLast7Days() {
     const days = [];
     const today = new Date();
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
+    // Find Monday of current week
+    const day = today.getDay();
+    const diff = day === 0 ? -6 : 1 - day; // Sunday goes back 6 days, others go to Monday
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + diff);
+
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(monday);
+      date.setDate(monday.getDate() + i);
       days.push(date.toISOString().split('T')[0]);
     }
     return days;
