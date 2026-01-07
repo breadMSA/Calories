@@ -39,11 +39,11 @@ export function PhotoAnalyzer({ onClose, onSave }) {
         <!-- AI Upload Section -->
         <div id="upload-section" class="hidden">
           <button class="back-btn" id="back-from-upload">← 返回</button>
-          <label class="photo-upload" id="photo-upload">
+          <div class="photo-upload" id="photo-upload">
             <div class="photo-upload-icon">📸</div>
             <p class="photo-upload-text">點擊拍照或選擇照片</p>
-            <input type="file" accept="image/*" capture="environment" id="photo-input" style="display: none;">
-          </label>
+          </div>
+          <input type="file" accept="image/*" capture="environment" id="photo-input" style="display: none;">
         </div>
 
         <!-- Barcode Section -->
@@ -118,7 +118,9 @@ export function PhotoAnalyzer({ onClose, onSave }) {
             <div class="empty-state">
               <div class="empty-state-icon">😕</div>
               <p class="empty-state-text" id="error-message">分析失敗</p>
+              <p class="error-hint hidden" id="error-hint"></p>
               <button class="btn btn-secondary mt-md" id="retry-btn">重新選擇</button>
+              <button class="btn btn-ghost mt-sm hidden" id="manual-entry-btn">改用手動輸入</button>
             </div>
           </div>
         </div>
@@ -170,6 +172,8 @@ export function PhotoAnalyzer({ onClose, onSave }) {
   const resultWater = overlay.querySelector('#result-water');
   const resultNote = overlay.querySelector('#result-note');
   const errorMessage = overlay.querySelector('#error-message');
+  const errorHint = overlay.querySelector('#error-hint');
+  const manualEntryBtn = overlay.querySelector('#manual-entry-btn');
 
   // Close handlers
   const close = () => {
@@ -316,11 +320,12 @@ export function PhotoAnalyzer({ onClose, onSave }) {
         analysisResult = result;
         showResult(result, 'barcode');
       } else {
-        showError(result.error || '找不到此條碼對應的產品');
+        // Show error with manual entry option for "not found" cases
+        showError(result.error || '找不到此條碼對應的產品', true);
       }
     } catch (error) {
       console.error('Barcode lookup error:', error);
-      showError(error.message || '查詢失敗，請稍後再試');
+      showError(error.message || '查詢失敗，請稍後再試', false);
     } finally {
       barcodeLoading.classList.add('hidden');
     }
@@ -382,16 +387,36 @@ export function PhotoAnalyzer({ onClose, onSave }) {
     saveBtn.classList.remove('hidden');
   }
 
-  function showError(message) {
+  function showError(message, showManualOption = false) {
     previewImage.style.display = 'none';
     previewSection.classList.remove('hidden');
     errorSection.classList.remove('hidden');
     errorMessage.textContent = message;
+
+    if (showManualOption && currentMode === 'barcode') {
+      errorHint.textContent = '台灣本地產品可能不在國際資料庫中';
+      errorHint.classList.remove('hidden');
+      manualEntryBtn.classList.remove('hidden');
+    } else {
+      errorHint.classList.add('hidden');
+      manualEntryBtn.classList.add('hidden');
+    }
   }
 
   // Retry
   retryBtn.addEventListener('click', () => {
     resetToModeSelection();
+  });
+
+  // Manual entry fallback
+  manualEntryBtn.addEventListener('click', () => {
+    // Close this modal and trigger manual entry
+    stopBarcodeScanner();
+    document.removeEventListener('keydown', handleKeyDown);
+    overlay.remove();
+    onClose();
+    // Dispatch custom event to open manual entry form
+    window.dispatchEvent(new CustomEvent('openManualFoodEntry'));
   });
 
   // Save

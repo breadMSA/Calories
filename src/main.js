@@ -119,4 +119,9 @@ class App {
 }
 
 // Initialize app
-new App();
+const app = new App();
+
+// Listen for manual food entry requests (from PhotoAnalyzer fallback)
+window.addEventListener('openManualFoodEntry', () => {
+  app.showFoodEntry();
+});
