@@ -28,9 +28,9 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: 'API configuration error' });
         }
 
-        // Initialize Gemini with gemma-3-12b model
+        // Initialize Gemini with gemma-3-12b-it model
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemma-3-12b' });
+        const model = genAI.getGenerativeModel({ model: 'gemma-3-12b-it' });
 
         // Prepare prompt
         const prompt = `分析這張食物照片，估算其營養成分。
