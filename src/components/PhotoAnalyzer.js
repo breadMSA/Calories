@@ -99,33 +99,33 @@ export function PhotoAnalyzer({ onClose, onSave }) {
           
           <div id="result-section" class="hidden">
             <div class="analysis-result">
-              <div class="analysis-food-name" id="result-name">-</div>
-              <div class="analysis-nutrients">
-                <div class="analysis-nutrient">
+              <input type="text" class="analysis-food-name-input" id="result-name" value="-">
+              <div class="analysis-nutrients-editable">
+                <div class="analysis-nutrient-edit">
                   <span class="analysis-nutrient-icon">🔥</span>
-                  <span class="analysis-nutrient-value" id="result-calories">0</span>
+                  <input type="number" step="0.1" class="nutrient-input" id="result-calories" value="0">
                   <span class="analysis-nutrient-label">kcal</span>
                 </div>
-                <div class="analysis-nutrient">
+                <div class="analysis-nutrient-edit">
                   <span class="analysis-nutrient-icon">💪</span>
-                  <span class="analysis-nutrient-value" id="result-protein">0</span>
+                  <input type="number" step="0.1" class="nutrient-input" id="result-protein" value="0">
                   <span class="analysis-nutrient-label">g 蛋白質</span>
                 </div>
-                <div class="analysis-nutrient">
+                <div class="analysis-nutrient-edit">
                   <span class="analysis-nutrient-icon">🧂</span>
-                  <span class="analysis-nutrient-value" id="result-sodium">0</span>
+                  <input type="number" step="0.1" class="nutrient-input" id="result-sodium" value="0">
                   <span class="analysis-nutrient-label">mg 鈉</span>
                 </div>
-                <div class="analysis-nutrient">
+                <div class="analysis-nutrient-edit">
                   <span class="analysis-nutrient-icon">💧</span>
-                  <span class="analysis-nutrient-value" id="result-water">0</span>
+                  <input type="number" step="0.1" class="nutrient-input" id="result-water" value="0">
                   <span class="analysis-nutrient-label">ml 水分</span>
                 </div>
               </div>
             </div>
             
             <p class="text-center text-muted mt-md" style="font-size: var(--font-size-sm);" id="result-note">
-              以上為 AI 估算結果，實際營養素可能有所差異
+              可直接修改數值，點擊「加入今日記錄」儲存
             </p>
           </div>
           
@@ -421,18 +421,18 @@ export function PhotoAnalyzer({ onClose, onSave }) {
   });
 
   function showResult(result, source) {
-    resultName.textContent = result.name || '未知食物';
-    resultCalories.textContent = result.calories || 0;
-    resultProtein.textContent = result.protein || 0;
-    resultSodium.textContent = result.sodium || 0;
-    resultWater.textContent = result.water || 0;
+    resultName.value = result.name || '未知食物';
+    resultCalories.value = result.calories || 0;
+    resultProtein.value = result.protein || 0;
+    resultSodium.value = result.sodium || 0;
+    resultWater.value = result.water || 0;
 
     if (source === 'barcode') {
-      resultNote.textContent = `來源：Open Food Facts（份量：${result.servingSize || '100g'}）`;
+      resultNote.textContent = `來源：Open Food Facts - 可直接修改數值`;
       // Show preview section without image for barcode results
       previewImage.style.display = 'none';
     } else {
-      resultNote.textContent = '以上為 AI 估算結果，實際營養素可能有所差異';
+      resultNote.textContent = '可直接修改數值，點擊「加入今日記錄」儲存';
       previewImage.style.display = 'block';
     }
 
@@ -476,21 +476,20 @@ export function PhotoAnalyzer({ onClose, onSave }) {
 
   // Save
   saveBtn.addEventListener('click', async () => {
-    if (!analysisResult) return;
-
     saveBtn.disabled = true;
     saveBtn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; border-width: 2px;"></div>';
 
     try {
+      // Read values from input fields (user may have edited them)
       const entry = {
         id: generateId(),
         date: getTodayDate(),
         time: getCurrentTime(),
-        name: analysisResult.name || '未知食物',
-        calories: analysisResult.calories || 0,
-        protein: analysisResult.protein || 0,
-        sodium: analysisResult.sodium || 0,
-        water: analysisResult.water || 0,
+        name: resultName.value || '未知食物',
+        calories: parseFloat(resultCalories.value) || 0,
+        protein: parseFloat(resultProtein.value) || 0,
+        sodium: parseFloat(resultSodium.value) || 0,
+        water: parseFloat(resultWater.value) || 0,
         source: currentMode === 'barcode' ? 'barcode' : 'ai'
       };
 

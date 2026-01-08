@@ -38,21 +38,24 @@ export default async function handler(req, res) {
         const model = genAI.getGenerativeModel({
             model: 'gemini-2.5-flash',
             generationConfig: {
-                maxOutputTokens: 512,  // Enough for JSON with Chinese text
-                temperature: 0.3       // Lower temperature for more consistent output
+                maxOutputTokens: 512,
+                temperature: 0.3
             }
         });
 
-        // Simplified prompt for faster response
+        // Improved prompt: keep decimals, estimate even without nutrition labels
         const prompt = `分析這張食物照片的營養成分。
 
-回覆格式（只回傳 JSON）：
-{"name": "食物名稱", "calories": 熱量kcal, "protein": 蛋白質g, "sodium": 鈉mg, "water": 水分ml}
+重要規則：
+1. 如果看到營養標示，請精確讀取數值（保留小數點，如 2.8 不要變成 2）
+2. 如果沒有營養標示，請根據食物外觀和份量進行合理估算（不要回傳全部 0）
+3. 數值可以是小數（如 2.8、5.5）
 
-注意：
-- 根據份量估算數值
-- 非飲料 water 填 0
-- 無法辨識則 name 填「未知食物」，數值為 0`;
+回覆格式（只回傳 JSON，不要其他文字）：
+{"name": "食物名稱", "calories": 熱量, "protein": 蛋白質, "sodium": 鈉, "water": 水分}
+
+單位說明：calories=kcal, protein=g, sodium=mg, water=ml
+非飲料的 water 填 0`;
 
         // Call Gemini Vision API
         const result = await model.generateContent([
@@ -89,13 +92,13 @@ export default async function handler(req, res) {
             };
         }
 
-        // Ensure all fields are present and valid
+        // Ensure all fields are present and valid (keep decimals with 1 decimal place)
         const sanitizedData = {
             name: String(nutritionData.name || '未知食物'),
-            calories: Math.max(0, parseInt(nutritionData.calories) || 0),
-            protein: Math.max(0, parseInt(nutritionData.protein) || 0),
-            sodium: Math.max(0, parseInt(nutritionData.sodium) || 0),
-            water: Math.max(0, parseInt(nutritionData.water) || 0)
+            calories: Math.max(0, Math.round(parseFloat(nutritionData.calories) * 10) / 10 || 0),
+            protein: Math.max(0, Math.round(parseFloat(nutritionData.protein) * 10) / 10 || 0),
+            sodium: Math.max(0, Math.round(parseFloat(nutritionData.sodium) * 10) / 10 || 0),
+            water: Math.max(0, Math.round(parseFloat(nutritionData.water) * 10) / 10 || 0)
         };
 
         return res.status(200).json(sanitizedData);

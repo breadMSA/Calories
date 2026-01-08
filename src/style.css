@@ -1931,3 +1931,67 @@ h4 {
 .barcode-alt-buttons {
   margin-top: var(--space-sm);
 }
+
+/* Editable Analysis Result */
+.analysis-food-name-input {
+  width: 100%;
+  background: var(--bg-tertiary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  font-family: inherit;
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: var(--space-md);
+}
+
+.analysis-food-name-input:focus {
+  outline: none;
+  border-color: var(--accent-green);
+}
+
+.analysis-nutrients-editable {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+.analysis-nutrient-edit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+}
+
+.nutrient-input {
+  width: 70px;
+  background: var(--bg-secondary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs) var(--space-sm);
+  font-family: inherit;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.nutrient-input:focus {
+  outline: none;
+  border-color: var(--accent-green);
+}
+
+.nutrient-input::-webkit-inner-spin-button,
+.nutrient-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.nutrient-input[type=number] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
