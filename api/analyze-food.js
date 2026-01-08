@@ -38,7 +38,7 @@ export default async function handler(req, res) {
         const model = genAI.getGenerativeModel({
             model: 'gemini-2.5-flash',
             generationConfig: {
-                maxOutputTokens: 256,  // Limit response size for faster response
+                maxOutputTokens: 512,  // Enough for JSON with Chinese text
                 temperature: 0.3       // Lower temperature for more consistent output
             }
         });
