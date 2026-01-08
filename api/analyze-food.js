@@ -1,6 +1,11 @@
 // Vercel Serverless Function - AI Food Analysis API
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+// Configure longer timeout for Vercel
+export const config = {
+    maxDuration: 60 // 60 seconds timeout
+};
+
 export default async function handler(req, res) {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -28,27 +33,26 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: 'API configuration error' });
         }
 
-        // Initialize Gemini with gemma-3-12b-it model
+        // Initialize Gemini with gemma-3-4b-it model (fastest with vision support)
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemma-3-12b-it' });
+        const model = genAI.getGenerativeModel({
+            model: 'gemma-3-4b-it',
+            generationConfig: {
+                maxOutputTokens: 256,  // Limit response size for faster response
+                temperature: 0.3       // Lower temperature for more consistent output
+            }
+        });
 
-        // Prepare prompt
-        const prompt = `分析這張食物照片，估算其營養成分。
+        // Simplified prompt for faster response
+        const prompt = `分析這張食物照片的營養成分。
 
-請以 JSON 格式回覆，包含以下欄位：
-- name: 食物名稱（繁體中文）
-- calories: 估計熱量（kcal，整數）
-- protein: 估計蛋白質（公克，整數）
-- sodium: 估計鈉含量（毫克，整數）
-- water: 如果是飲料，估計水分含量（毫升，整數），否則為 0
+回覆格式（只回傳 JSON）：
+{"name": "食物名稱", "calories": 熱量kcal, "protein": 蛋白質g, "sodium": 鈉mg, "water": 水分ml}
 
-注意事項：
-1. 請根據照片中食物的份量估算
-2. 如果無法辨識食物，name 回傳「未知食物」，其他數值為 0
-3. 只回傳 JSON，不要有其他文字
-
-範例回覆：
-{"name": "雞胸肉便當", "calories": 650, "protein": 45, "sodium": 800, "water": 0}`;
+注意：
+- 根據份量估算數值
+- 非飲料 water 填 0
+- 無法辨識則 name 填「未知食物」，數值為 0`;
 
         // Call Gemini Vision API
         const result = await model.generateContent([
