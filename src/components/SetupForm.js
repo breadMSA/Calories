@@ -107,9 +107,10 @@ export function SetupForm({ onComplete, existingProfile = null }) {
               <input type="number" class="form-input" id="target-water" value="" min="500" max="10000">
               <span class="input-suffix">ml</span>
             </div>
-          </div>
+        </div>
         </div>
       </div>
+      
       
       <button type="button" class="btn btn-primary btn-block btn-lg mt-lg" id="save-btn">
         ${isEditing ? '💾 儲存變更' : '🚀 開始使用'}

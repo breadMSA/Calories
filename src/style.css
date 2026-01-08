@@ -1908,3 +1908,26 @@ h4 {
   color: var(--text-muted);
   margin-top: var(--space-sm);
 }
+
+/* Upload Options Grid */
+.upload-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.upload-options .photo-upload {
+  padding: var(--space-lg);
+}
+
+/* Barcode Alternatives */
+.barcode-alternatives {
+  text-align: center;
+  padding: var(--space-md) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: var(--space-md);
+}
+
+.barcode-alt-buttons {
+  margin-top: var(--space-sm);
+}

@@ -39,11 +39,18 @@ export function PhotoAnalyzer({ onClose, onSave }) {
         <!-- AI Upload Section -->
         <div id="upload-section" class="hidden">
           <button class="back-btn" id="back-from-upload">← 返回</button>
-          <div class="photo-upload" id="photo-upload">
-            <div class="photo-upload-icon">📸</div>
-            <p class="photo-upload-text">點擊拍照或選擇照片</p>
+          <div class="upload-options">
+            <div class="photo-upload" id="camera-upload">
+              <div class="photo-upload-icon">📷</div>
+              <p class="photo-upload-text">拍照</p>
+            </div>
+            <div class="photo-upload" id="gallery-upload">
+              <div class="photo-upload-icon">🖼️</div>
+              <p class="photo-upload-text">選擇圖片</p>
+            </div>
           </div>
-          <input type="file" accept="image/*" capture="environment" id="photo-input" style="display: none;">
+          <input type="file" accept="image/*" capture="environment" id="camera-input" style="display: none;">
+          <input type="file" accept="image/*" id="gallery-input" style="display: none;">
         </div>
 
         <!-- Barcode Section -->
@@ -53,6 +60,14 @@ export function PhotoAnalyzer({ onClose, onSave }) {
           <div id="barcode-scanner-container" class="barcode-scanner-container">
             <div id="barcode-reader" class="barcode-reader"></div>
             <p class="barcode-hint">將條碼對準框內自動掃描</p>
+          </div>
+          
+          <div class="barcode-alternatives">
+            <p class="manual-hint">或者</p>
+            <div class="barcode-alt-buttons">
+              <button class="btn btn-secondary" id="barcode-image-btn">🖼️ 從圖片掃描</button>
+            </div>
+            <input type="file" accept="image/*" id="barcode-image-input" style="display: none;">
           </div>
           
           <div class="barcode-manual">
@@ -147,8 +162,10 @@ export function PhotoAnalyzer({ onClose, onSave }) {
   // AI mode elements
   const uploadSection = overlay.querySelector('#upload-section');
   const backFromUpload = overlay.querySelector('#back-from-upload');
-  const photoUpload = overlay.querySelector('#photo-upload');
-  const photoInput = overlay.querySelector('#photo-input');
+  const cameraUpload = overlay.querySelector('#camera-upload');
+  const galleryUpload = overlay.querySelector('#gallery-upload');
+  const cameraInput = overlay.querySelector('#camera-input');
+  const galleryInput = overlay.querySelector('#gallery-input');
   const previewSection = overlay.querySelector('#preview-section');
   const previewImage = overlay.querySelector('#preview-image');
   const loadingSection = overlay.querySelector('#loading-section');
@@ -163,6 +180,8 @@ export function PhotoAnalyzer({ onClose, onSave }) {
   const barcodeInput = overlay.querySelector('#barcode-input');
   const barcodeSearchBtn = overlay.querySelector('#barcode-search-btn');
   const barcodeLoading = overlay.querySelector('#barcode-loading');
+  const barcodeImageBtn = overlay.querySelector('#barcode-image-btn');
+  const barcodeImageInput = overlay.querySelector('#barcode-image-input');
 
   // Result elements
   const resultName = overlay.querySelector('#result-name');
@@ -331,10 +350,15 @@ export function PhotoAnalyzer({ onClose, onSave }) {
     }
   }
 
-  // Photo selection (AI mode)
-  photoUpload.addEventListener('click', () => photoInput.click());
+  // Photo selection (AI mode) - separate camera and gallery handlers
+  cameraUpload.addEventListener('click', () => cameraInput.click());
+  galleryUpload.addEventListener('click', () => galleryInput.click());
 
-  photoInput.addEventListener('change', async (e) => {
+  // Handle camera input (with capture attribute for mobile)
+  cameraInput.addEventListener('change', handlePhotoSelected);
+  galleryInput.addEventListener('change', handlePhotoSelected);
+
+  async function handlePhotoSelected(e) {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -363,6 +387,37 @@ export function PhotoAnalyzer({ onClose, onSave }) {
       }
     };
     reader.readAsDataURL(file);
+  }
+
+  // Barcode image scanning
+  barcodeImageBtn.addEventListener('click', () => barcodeImageInput.click());
+
+  barcodeImageInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Show loading
+    barcodeLoading.classList.remove('hidden');
+    barcodeSection.classList.add('hidden');
+
+    try {
+      // Dynamically load html5-qrcode if not already loaded
+      if (!window.Html5Qrcode) {
+        await loadScript('https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js');
+      }
+
+      // Scan barcode from image file
+      const html5QrCode = new Html5Qrcode("temp-reader", { verbose: false });
+      const decodedText = await html5QrCode.scanFile(file, true);
+
+      // Found barcode, look it up
+      await lookupBarcode(decodedText);
+    } catch (error) {
+      console.error('Image barcode scan error:', error);
+      barcodeLoading.classList.add('hidden');
+      barcodeSection.classList.remove('hidden');
+      showError('無法從圖片中識別條碼，請嘗試其他方式', true);
+    }
   });
 
   function showResult(result, source) {
