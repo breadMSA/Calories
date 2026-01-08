@@ -33,10 +33,10 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: 'API configuration error' });
         }
 
-        // Initialize Gemini with gemma-3-4b-it model (fastest with vision support)
+        // Initialize Gemini with gemini-2.5-flash model (fast and smart)
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: 'gemma-3-4b-it',
+            model: 'gemini-2.5-flash',
             generationConfig: {
                 maxOutputTokens: 256,  // Limit response size for faster response
                 temperature: 0.3       // Lower temperature for more consistent output
