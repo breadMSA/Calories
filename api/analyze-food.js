@@ -43,18 +43,28 @@ export default async function handler(req, res) {
             }
         });
 
-        // Improved prompt: keep decimals, estimate even without nutrition labels
-        const prompt = `分析這張食物照片的營養成分。
+        // Improved prompt: MUST estimate, never return all zeros
+        const prompt = `你是一位專業營養師。請分析這張食物照片並估算營養成分。
 
-重要規則：
-1. 如果看到營養標示，請精確讀取數值（保留小數點，如 2.8 不要變成 2）
-2. 如果沒有營養標示，請根據食物外觀和份量進行合理估算（不要回傳全部 0）
-3. 數值可以是小數（如 2.8、5.5）
+【最重要規則】
+- 你必須根據食物的種類、份量、烹調方式來估算營養數值
+- 絕對禁止回傳全部為 0 的數值！
+- 即使沒有營養標示，也要根據你的營養學知識進行合理估算
 
-回覆格式（只回傳 JSON，不要其他文字）：
-{"name": "食物名稱", "calories": 熱量, "protein": 蛋白質, "sodium": 鈉, "water": 水分}
+【估算指引】
+- 一碗白飯約 250kcal、5g 蛋白質
+- 一份雞腿便當約 700-900kcal、30-40g 蛋白質
+- 一杯手搖飲約 300-500kcal、0g 蛋白質、500ml 水分
+- 一份泡麵約 400-500kcal、8-10g 蛋白質、1000-2000mg 鈉
 
-單位說明：calories=kcal, protein=g, sodium=mg, water=ml
+【如果看到營養標示】
+請精確讀取數值，保留小數點（如 2.8g 不要變成 2g）
+
+【回覆格式】
+只回傳 JSON，不要任何其他文字：
+{"name": "食物名稱", "calories": 數字, "protein": 數字, "sodium": 數字, "water": 數字}
+
+單位：calories=kcal, protein=g, sodium=mg, water=ml
 非飲料的 water 填 0`;
 
         // Call Gemini Vision API
