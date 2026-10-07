@@ -76,5 +76,6 @@ src/
   components/   UI 元件
   lib/          API client、查詢 hooks、日期、格式化、圖片壓縮、資料庫搜尋
 public/data/    衛福部食品營養成分資料（由 scripts/build-tfda.mjs 產生）
-scripts/        資料與圖示產生腳本
+scripts/        食品資料轉換腳本
+public/icon*    App 圖示（PNG 由 icon.svg 渲染）
 ```

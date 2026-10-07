@@ -9,6 +9,7 @@
   --surface: #ffffff;
   --surface-2: #f0f0ec;
   --surface-3: #e7e7e2;
+  --selected: #ffffff;
   --border: #e3e3de;
   --border-strong: #cfcfc8;
   --text: #191918;
@@ -19,6 +20,8 @@
   --accent-hover: #255d43;
   --accent-soft: #e5efe9;
   --on-accent: #ffffff;
+  --primary: #2c6e4f;
+  --primary-hover: #255d43;
 
   --danger: #b3412e;
   --danger-soft: #f8e9e6;
@@ -49,7 +52,8 @@
     --bg: #121211;
     --surface: #1b1b1a;
     --surface-2: #232322;
-    --surface-3: #2c2c2a;
+    --surface-3: #363632;
+    --selected: #3a3a37;
     --border: #2b2b29;
     --border-strong: #3b3b38;
     --text: #ececea;
@@ -59,7 +63,9 @@
     --accent: #5eb38a;
     --accent-hover: #72c29b;
     --accent-soft: #1f3329;
-    --on-accent: #0d1f16;
+    --on-accent: #ffffff;
+    --primary: #2f7d58;
+    --primary-hover: #378f66;
 
     --danger: #e0715d;
     --danger-soft: #3a211c;
@@ -349,12 +355,12 @@ button {
 }
 
 .btn-primary {
-  background: var(--accent);
+  background: var(--primary);
   color: var(--on-accent);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--accent-hover);
+  background: var(--primary-hover);
 }
 
 .btn-secondary {
@@ -424,6 +430,12 @@ button {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+  align-items: start;
+}
+
+.field-row > .field,
+.nutrient-form > .field {
+  margin-top: 0;
 }
 
 .field-row-3 {
@@ -562,7 +574,7 @@ button {
 }
 
 .segmented-item.is-active {
-  background: var(--surface);
+  background: var(--selected);
   color: var(--text);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.08), 0 0 0 1px var(--border);
 }
@@ -1571,9 +1583,7 @@ button.row:hover,
   gap: 12px;
 }
 
-.nutrient-form .field + .field {
-  margin-top: 0;
-}
+
 
 /* ==========================================================================
    Trends
@@ -1777,10 +1787,38 @@ button.row:hover,
 }
 
 .option input {
-  accent-color: var(--accent);
-  width: 18px;
-  height: 18px;
+  appearance: none;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
   margin: 0;
+  border: 1.5px solid var(--text-3);
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.option input::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: scale(0);
+  transition: transform 120ms;
+}
+
+.option input:checked {
+  border-color: var(--accent);
+}
+
+.option input:checked::after {
+  transform: scale(1);
+}
+
+.option:hover {
+  border-color: var(--text-3);
 }
 
 .option:has(input:checked) {
@@ -1789,15 +1827,25 @@ button.row:hover,
 }
 
 .option-title {
+  display: block;
   font-weight: 550;
   font-size: 14px;
+  line-height: 1.35;
 }
 
 .option-hint {
+  display: block;
   font-size: 12px;
   color: var(--text-3);
+  margin-top: 1px;
 }
 
 .search .input::-webkit-search-cancel-button {
   display: none;
+}
+
+/* CJK fonts render password bullets full-width; use a Latin face for them. */
+input[type='password'] {
+  font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  letter-spacing: 0.08em;
 }

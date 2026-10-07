@@ -88,7 +88,7 @@ export function BodyForm({
 
       <div className="field-row field-row-3">
         <Field label="出生年" htmlFor="birthYear" error={err('birthYear')}>
-          <NumberInput id="birthYear" inputMode="numeric" placeholder="1995" value={draft.birthYear} onChange={(v) => set('birthYear', v)} />
+          <NumberInput id="birthYear" inputMode="numeric" placeholder="1995" value={draft.birthYear} suffix="年" onChange={(v) => set('birthYear', v)} />
         </Field>
         <Field label="身高" htmlFor="heightCm" error={err('heightCm')}>
           <NumberInput id="heightCm" value={draft.heightCm} suffix="cm" onChange={(v) => set('heightCm', v)} />
@@ -110,7 +110,7 @@ export function BodyForm({
               />
               <span>
                 <span className="option-title">{ACTIVITY_LEVELS[level].label}</span>
-                <span className="option-hint"> · {ACTIVITY_LEVELS[level].hint}</span>
+                <span className="option-hint">{ACTIVITY_LEVELS[level].hint}</span>
               </span>
             </label>
           ))}
