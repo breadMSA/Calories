@@ -43,7 +43,7 @@ npm run build      # 正式建置
 ## 部署到 Vercel
 
 1. 在 Vercel 匯入此 GitHub 專案（Framework 選 **Vite**）。
-2. **Storage → Create Database → Neon (Postgres)**，連結到專案。Vercel 會自動加入 `DATABASE_URL`。資料表會在第一次請求時自動建立。
+2. **Storage → Create Database → Neon (Postgres)**，Region 選 **Singapore (aws-ap-southeast-1)**（API 已在 `vercel.json` 設定為新加坡 `sin1`，兩者要在同一地區），連結到專案。Vercel 會自動加入 `DATABASE_URL`。資料表會在第一次請求時自動建立。
 3. **Settings → Environment Variables** 新增：
 
    | 名稱 | 說明 |
