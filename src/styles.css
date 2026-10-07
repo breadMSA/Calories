@@ -1849,3 +1849,16 @@ input[type='password'] {
   font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
   letter-spacing: 0.08em;
 }
+
+.water-chips {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.water-chips .chip {
+  padding: 0;
+  font-size: 13px;
+  white-space: nowrap;
+}

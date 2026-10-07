@@ -136,11 +136,38 @@ function MealSection({
   );
 }
 
-const WATER_STEP = 250;
+const WATER_PRESETS = [100, 250, 350, 500];
 
 function WaterCard({ date, logged, fromFood, target }: { date: string; logged: number; fromFood: number; target: number }) {
   const setWater = useSetWater(date);
   const total = logged + fromFood;
+  // Amounts added in this session, so the last one can be undone exactly.
+  const [history, setHistory] = useState<number[]>([]);
+  const [custom, setCustom] = useState<string | null>(null);
+
+  const add = (ml: number) => {
+    if (!(ml > 0)) return;
+    setWater.mutate(Math.min(20_000, logged + ml));
+    setHistory((h) => [...h, ml]);
+  };
+
+  const undo = () => {
+    const last = history[history.length - 1];
+    if (last == null) return;
+    setWater.mutate(Math.max(0, logged - last));
+    setHistory((h) => h.slice(0, -1));
+  };
+
+  const submitCustom = (e: FormEvent) => {
+    e.preventDefault();
+    const ml = Math.round(parseNum(custom ?? ''));
+    if (!(ml > 0 && ml <= 5000)) return;
+    add(ml);
+    setCustom(null);
+  };
+
+  const last = history[history.length - 1];
+
   return (
     <section className="card card-pad" aria-label="飲水">
       <div className="water-row">
@@ -148,22 +175,40 @@ function WaterCard({ date, logged, fromFood, target }: { date: string; logged: n
           <div className="energy-label">飲水</div>
           <strong>{fmt(total)}</strong> <span className="subtle">/ {fmt(target)} ml</span>
         </div>
-        <div className="water-actions">
-          <IconButton
-            label={`減少 ${WATER_STEP} ml`}
-            className="stepper"
-            disabled={logged <= 0}
-            onClick={() => setWater.mutate(Math.max(0, logged - WATER_STEP))}
-          >
-            <Minus size={18} />
-          </IconButton>
-          <Button onClick={() => setWater.mutate(logged + WATER_STEP)}>+{WATER_STEP} ml</Button>
-        </div>
+        {last != null && (
+          <Button size="sm" variant="ghost" onClick={undo}>
+            <Minus size={14} /> 撤銷 {fmt(last)} ml
+          </Button>
+        )}
       </div>
       <div style={{ marginTop: 12 }}>
         <ProgressBar label="飲水進度" value={total} max={target} tone="water" />
       </div>
-      {fromFood > 0 && <p className="field-hint">含飲料與湯品 {fmt(fromFood)} ml</p>}
+
+      {custom == null ? (
+        <div className="water-chips">
+          {WATER_PRESETS.map((ml) => (
+            <button key={ml} type="button" className="chip" onClick={() => add(ml)}>
+              +{ml} ml
+            </button>
+          ))}
+          <button type="button" className="chip" onClick={() => setCustom('')}>
+            自訂
+          </button>
+        </div>
+      ) : (
+        <form className="weight-inline" style={{ marginTop: 14 }} onSubmit={submitCustom}>
+          <NumberInput aria-label="飲水量" value={custom} onChange={setCustom} placeholder="例如 600" suffix="ml" autoFocus />
+          <Button type="submit" variant="primary" disabled={!(parseNum(custom) > 0)}>
+            加入
+          </Button>
+          <Button variant="ghost" onClick={() => setCustom(null)}>
+            取消
+          </Button>
+        </form>
+      )}
+
+      {fromFood > 0 && <p className="field-hint">含飲料與湯品 {fmt(fromFood)} ml（記錄食物時自動計入）</p>}
       <ErrorNote error={setWater.error} />
     </section>
   );
@@ -273,7 +318,7 @@ export function DiaryPage() {
               onEdit={setEditing}
             />
           ))}
-          <WaterCard date={date} logged={day.data.waterMl} fromFood={totals.water} target={profile.targets.water} />
+          <WaterCard key={date} date={date} logged={day.data.waterMl} fromFood={totals.water} target={profile.targets.water} />
           <WeightCard key={date} date={date} weightKg={day.data.weightKg} fallback={profile.weightKg} />
         </div>
       )}
